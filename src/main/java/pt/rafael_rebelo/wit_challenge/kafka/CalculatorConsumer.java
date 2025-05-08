@@ -2,7 +2,6 @@ package pt.rafael_rebelo.wit_challenge.kafka;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
@@ -34,23 +33,13 @@ public class CalculatorConsumer {
         logger.info("Received request: {} {} {}", request.getOperation(), request.getA(), request.getB());
 
         try {
-            switch(request.getOperation().toLowerCase()) {
-                case "sum":
-                    result = calculatorService.sum(request.getA(), request.getB());
-                    break;
-                case "subtract":
-                    result = calculatorService.subtract(request.getA(), request.getB());
-                    break;
-                case "multiply":
-                    result = calculatorService.multiply(request.getA(), request.getB());
-                    break;
-                case "divide":
-                    result = calculatorService.divide(request.getA(), request.getB());
-                    break;
-                default:
-                    error = "Unsupported operation: " + request.getOperation();
-                    logger.error(error);
-            }
+            result = switch (request.getOperation().toLowerCase()) {
+                case "sum" -> calculatorService.sum(request.getA(), request.getB());
+                case "subtract" -> calculatorService.subtract(request.getA(), request.getB());
+                case "multiply" -> calculatorService.multiply(request.getA(), request.getB());
+                case "divide" -> calculatorService.divide(request.getA(), request.getB());
+                default -> null;
+            };
         } catch (ArithmeticException ae) {
             error = ae.getMessage();
             logger.error(error, ae);
